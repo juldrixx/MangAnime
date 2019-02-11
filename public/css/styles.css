@@ -1,0 +1,99 @@
+body{background-color:#f1f1f2}
+.container{max-width: 90vw;}
+.fa-check{background:#0dab76;color:#fff;}
+.fa-times{background:#d10531;color:#fff;}
+.fa-link{background:#13a1ffc5;color:#fff;}
+.fa-trash{background:#554b4b;color:#fff;}
+a, a:hover{text-decoration: none;}
+
+header {position:relative;background-color:black;height:25VH;min-height:5rem;width:100%;overflow:hidden;user-select : none;}
+header video {position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;z-index:0;-ms-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-webkit-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);}
+header .container {position:relative;z-index:2;} 
+header .overlay {position:absolute;top:0;left:0;height:100%;width:100%;background-color:black;opacity:0.6;z-index:1;}
+header .display-3{font-size:6VH;font-family:'Verdana';}
+header .display-4{font-style:italic;font-size:2.5VH;}
+header .fa-angle-left{position:relative;left:0;top:0;color:#fff;text-decoration:none;font-size:4vH;padding-left:5px}
+
+.fa-times-circle{position:absolute;left:0;top:0;color:#fff;text-decoration:none;font-size:3vH;padding-top:5px;padding-left:5px;z-index: 2;}
+.fa-times-circle:hover{color:rgb(199, 199, 199);}
+
+#username_input{position:absolute;top:50%;left:50%;width:55vH;transform:translate(-50%, -50%);}
+#titre{position:absolute;top:25%;text-align:center;}
+#titre h1{font-size:5VH;font-family:'Verdana';}
+#titre h2{font-style:italic;font-size:2VH;}
+.index{background-color:#1e2122;}
+
+
+#div_btn_manga{position:absolute;left:0;height: 100vH; width: 50vw;background-color:black;opacity:0.2;z-index: 1;}
+#div_btn_anime{position:absolute;right:0;height: 100vH; width: 50vw;background-color:black;opacity:0.2;z-index: 1;}
+#div_btn #div_manga #label_btn_manga{position:absolute;top:50%;left:25%;transform:translate(-50%, -50%);color:#fff;font-size:10vw;z-index: 2;}
+#div_btn #div_anime #label_btn_anime{position:absolute;top:50%;left:75%;transform:translate(-50%, -50%);color:#fff;font-size:10vw;z-index: 2;}
+#btn_manga{left:0; height: 100%; width: 50vw; font-size: 6VH;background-image:url("/img/manga.jpg");background-position:center;background-repeat:no-repeat;border-style:none;border-radius:0px;}
+#btn_anime{right:0; height: 100%; width: 50vw; font-size: 6VH;background-image:url("/img/anime.png");background-position:center;background-repeat:no-repeat;border-style:none;border-radius:0px;}
+#div_btn_manga:hover, #div_btn_anime:hover{opacity:0.6}
+
+.icon_manga_anime{padding:0;list-style:none}
+.icon_manga_anime li a{text-align:center}
+.icon_manga_anime{margin:0}
+.icon_manga_anime li{display:inline-block}
+.icon_manga_anime li a{display:block;width:35px;height:35px;line-height:35px;border-radius:50%;font-size:18px;margin-right:10px;transition:all .5s ease 0s}
+.icon_manga_anime li a:hover{transform:rotate(360deg);color:#fff;}
+
+table #new_last_viewed::-webkit-inner-spin-button, table #new_last_viewed::-webkit-outer-spin-button{-webkit-appearance: none;margin:0;}
+table #new_last_read::-webkit-inner-spin-button, table #new_last_read::-webkit-outer-spin-button{-webkit-appearance: none;margin:0;}
+table .btn_ok{border:none;padding-top:3px;padding-bottom:3px;background:#ffffff;font-style:Bold;}
+table .btn_ok:hover{background:#ebebeb;}
+
+#rss_input, #username_input{
+    padding: 3px;
+    border: solid 1px #E4E4E4;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+#rss_input input, #username_input input{
+    border: 0;
+    box-shadow: none;
+}
+
+#rss_input .btn, #username_input .btn{
+    margin: 6px 0 0 0;
+    background: none;
+    box-shadow: none;
+    border: 0;
+    color: #666666;
+    padding: 0 8px 0 10px;
+    border-left: solid 1px #ccc;
+}
+
+#rss_input .btn:hover, #username_input .btn:hover{
+    border: 0;
+    box-shadow: none;
+    border-left: solid 1px #ccc;
+}
+
+
+@media only screen and (max-width:600px){
+header {background-color:#143c49;}
+header video{visibility:hidden;}
+#rss_input{width:110%;  margin-left: -5vw;}
+table{font-size: 3vw; width:100%; max-width:90vw; margin-left: -5vw;}
+header .fa-angle-left{font-size:10vw;}
+.icon_manga_anime li a{font-size:5vw;border-radius:0%;margin-right:0;background-color:rgba(255, 255, 255, 0);}
+.fa-times{color:#d10531;}
+.fa-link{color:#13a1ffc5;}
+.fa-trash{color:#554b4b;}
+.fa-check{color:#36eb08;}
+}
+@media only screen and (max-height:400px){
+header {background-color:#143c49;}
+header video{visibility:hidden;}
+#rss_input{width:110%;  margin-left: -5vw;}
+table{font-size: 3vh; width:100%; max-width:90vw; }
+header .fa-angle-left{font-size:7vw;}
+.icon_manga_anime li a{font-size:5vh;border-radius:0%;margin-right:0;background-color:rgba(255, 255, 255, 0);}
+.fa-times{color:#d10531;}
+.fa-link{color:#13a1ffc5;}
+.fa-trash{color:#554b4b;}
+.fa-check{color:#36eb08;}
+}

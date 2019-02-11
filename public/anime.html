@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MangAnime - Animes</title>
+    <link rel="icon" type="image/png" href="/img/favicon.png" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="600">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/anime.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="overlay"><a class="fa fa-angle-left" href="/index.html"></a></div>
+        <video playsinline="playsinline" autoplay="autoplay" muted="true" loop="loop">
+            <source src="video/banner.mp4" type="video/mp4">
+        </video>
+        <div class="container h-100">
+            <div class="d-flex h-100 text-center align-items-center">
+                <div class="w-100 text-white">
+                    <h1 class="display-3" id="title"></h1>
+                    <h2 class="display-4" id="season"></h2>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="container"> </div>
+</body>
+
+</html>

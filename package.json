@@ -1,0 +1,26 @@
+{
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-cached": "^1.1.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-watch": "^4.3.11",
+    "gulp-html-validator": "0.0.5",
+    "gulp-w3c-css": "^1.0.1",
+    "map-stream": "0.0.6"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "http-proxy-agent": "^1.0.0",
+    "node-fetch": "^1.6.3",
+    "object.entries": "^1.0.4",
+    "urlencode": "^1.1.0",
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.24",
+    "nodemon": "^1.11.0",
+    "mongodb ": "^3.1.10"
+  },
+  "scripts": {
+    "test": "node ./node_modules/gulp/bin/gulp.js",
+    "start": "node ./node_modules/nodemon/bin/nodemon.js --exec node serveur.js"
+  }
+}
