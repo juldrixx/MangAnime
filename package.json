@@ -17,7 +17,7 @@
     "xmldom": "^0.1.27",
     "xpath": "0.0.24",
     "nodemon": "^1.11.0",
-    "mongodb ": "^3.1.10"
+    "mongodb": "^3.1.10"
   },
   "scripts": {
     "test": "node ./node_modules/gulp/bin/gulp.js",
