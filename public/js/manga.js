@@ -1,33 +1,34 @@
+'use strict';
+
 function getCookie(cname) {
-    var name = cname + '=';
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
+    let name = cname + '=';
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i += 1) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) == 0) {
+        if (c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
         }
     }
     return '';
 }
 
-var username = getCookie('username');
+let username = getCookie('username');
 
-var updateManga = function (username, title, chapter) {
+let updateManga = function (username, title, chapter) {
     fetch('api/update/manga/' + username + '/' + title + '/' + chapter)
-        .then(function (response) {
+        .then(function () {
             location.reload();
         })
         .catch(function (error) {
             console.log(error);
         });
-}
+};
 
-var getManga = function () {
-
+let getManga = function () {
     let container = document.querySelector('#container');
     let div_container_mt = document.createElement('div');
     let h1_title = document.querySelector('#title');
@@ -51,7 +52,7 @@ var getManga = function () {
     container.appendChild(div_container_mt);
 
     let div_form = document.createElement('div');
-    let div_input = document.createElement('div');;
+    let div_input = document.createElement('div');
     let input_url_manga = document.createElement('input');
     let span_group_button = document.createElement('span');
     let input_btn = document.createElement('input');
@@ -75,21 +76,21 @@ var getManga = function () {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 'type': 'manga',
                 'username': username,
-                'rss': rss
-            })
+                'rss': rss,
+            }),
         })
-            .then(function (response) {
+            .then(function () {
                 location.reload();
             })
             .catch(function (error) {
                 console.log(error);
             });
-    }
+    };
 
     span_group_button.appendChild(input_btn);
     div_form.appendChild(div_input);
@@ -103,7 +104,7 @@ var getManga = function () {
         })
         .catch(function (error) {
             getManga();
-            console.log('error');
+            console.log(error);
         })
         .then(function (mangas) {
             let parent = div_add_manga;
@@ -138,7 +139,7 @@ var getManga = function () {
 
             let body = document.createElement('tbody');
             mangas.sort(function (a, b) {
-                return (a.not_completed === b.not_completed) ? 0 : a.not_completed ? -1 : 1
+                return (a.not_completed === b.not_completed) ? 0 : a.not_completed ? -1 : 1;
             });
             mangas.forEach(element => {
                 let parent = body;
@@ -176,7 +177,7 @@ var getManga = function () {
 
                     zone_nombre.type = 'number';
                     zone_nombre.id = 'new_last_read';
-                    if (element.last_read == 0) {
+                    if (element.last_read === 0) {
                         zone_nombre.value = 1;
                     }
                     else {
@@ -191,14 +192,14 @@ var getManga = function () {
                         if (document.querySelector('#new_last_read').value <= element.last_chapter && document.querySelector('#new_last_read').value >= 1) {
                             updateManga(username, element.url.split('/')[element.url.split('/').length - 2], document.querySelector('#new_last_read').value);
                         }
-                    }
+                    };
 
                     zone_nombre.min = 1;
                     zone_nombre.max = element.last_chapter;
 
                     last_read.appendChild(zone_nombre);
                     last_read.appendChild(zone_nombre_btn);
-                }
+                };
                 last_chapter.innerHTML = element.last_chapter;
 
                 ul_icon.className = 'icon_manga_anime';
@@ -223,16 +224,16 @@ var getManga = function () {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             'type': 'manga',
                             'username': username,
                             'rss': (element.url.replace('/manga/', '/rss/')).slice(0, -1) + '.xml',
-                            'title': element.url.split('/')[element.url.split('/').length - 2]
-                        })
+                            'title': element.url.split('/')[element.url.split('/').length - 2],
+                        }),
                     })
-                        .then(function (response) {
+                        .then(function () {
                             location.reload();
                         })
                         .catch(function (error) {
@@ -262,6 +263,6 @@ var getManga = function () {
         .catch(function (error) {
             console.log(error);
         });
-}
+};
 
 getManga();

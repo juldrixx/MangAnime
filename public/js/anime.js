@@ -1,13 +1,15 @@
+'use strict';
+
 function getCookie(cname) {
     var name = cname + '=';
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
+    for (let i = 0; i < ca.length; i += 1) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) == 0) {
+        if (c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
         }
     }
@@ -15,19 +17,27 @@ function getCookie(cname) {
 }
 
 
-var username = getCookie('username');
+let username = getCookie('username');
 
-var updateAnime = function (username, title, episode) {
+let updateAnime = function (username, title, episode) {
     fetch('api/update/anime/' + username + '/' + title + '/' + episode)
-        .then(function (response) {
+        .then(function () {
             location.reload();
         })
         .catch(function (error) {
             console.log(error);
         });
-}
+};
 
-var getAnime = function () {
+let getAnime = function () {
+    let saison  = ['Hiver', 'Printemps', 'Été', 'Automne'];
+    let month = new Date().getMonth();
+    if (month === 12) {
+        month = 1;
+    }
+    else {
+        month += 1;
+    }
 
     let container = document.querySelector('#container');
     let div_container_mt = document.createElement('div');
@@ -38,7 +48,7 @@ var getAnime = function () {
 
     div_container_mt.className = 'container mt-100';
     h1_title.innerHTML = 'Mes animes';
-    h2_season.innerHTML = 'Hiver 2019';
+    h2_season.innerHTML = saison[Math.floor(month/3)] + ' ' + new Date().getFullYear();;
     div_add_anime.id = 'add_anime';
     div_anime.className = 'row mt-30';
     div_anime.id = 'anime';
@@ -77,22 +87,21 @@ var getAnime = function () {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 'type': 'anime',
                 'username': username,
-                'rss': rss
-            })
+                'rss': rss,
+            }),
         })
-            .then(function (response) {
-                console.log('azeaze');
+            .then(function () {
                 location.reload();
             })
             .catch(function (error) {
                 console.log(error);
             });
-    }
+    };
 
     span_group_button.appendChild(input_btn);
     div_form.appendChild(div_input);
@@ -142,7 +151,7 @@ var getAnime = function () {
 
             let body = document.createElement('tbody');
             animes.sort(function (a, b) {
-                return (a.not_completed === b.not_completed) ? 0 : a.not_completed ? -1 : 1
+                return (a.not_completed === b.not_completed) ? 0 : a.not_completed ? -1 : 1;
             });
             animes.forEach(element => {
                 let parent = body;
@@ -180,7 +189,7 @@ var getAnime = function () {
 
                     zone_nombre.type = 'number';
                     zone_nombre.id = 'new_last_viewed';
-                    if (element.last_viewed == 0) {
+                    if (element.last_viewed === 0) {
                         zone_nombre.value = 1;
                     }
                     else {
@@ -195,14 +204,14 @@ var getAnime = function () {
                         if (document.querySelector('#new_last_viewed').value <= element.last_episode && document.querySelector('#new_last_viewed').value >= 1) {
                             updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], document.querySelector('#new_last_viewed').value);
                         }
-                    }
+                    };
 
                     zone_nombre.min = 1;
                     zone_nombre.max = element.last_episode;
 
                     last_viewed.appendChild(zone_nombre);
                     last_viewed.appendChild(zone_nombre_btn);
-                }
+                };
                 last_episode.innerHTML = element.last_episode;
 
                 ul_icon.className = 'icon_manga_anime';
@@ -227,16 +236,16 @@ var getAnime = function () {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             'type': 'anime',
                             'username': username,
                             'rss': element.url.replace('/anime/', '/rss/'),
-                            'title': element.url.split('/')[element.url.split('/').length - 2]
-                        })
+                            'title': element.url.split('/')[element.url.split('/').length - 2],
+                        }),
                     })
-                        .then(function (response) {
+                        .then(function () {
                             location.reload();
                         })
                         .catch(function (error) {
@@ -265,6 +274,6 @@ var getAnime = function () {
         .catch(function (error) {
             console.log(error);
         });
-}
+};
 
 getAnime();

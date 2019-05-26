@@ -1,22 +1,22 @@
 'use strict';
 
 function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
+    let d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = 'expires=' + d.toGMTString();
+    let expires = 'expires=' + d.toGMTString();
     document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
 }
 
 function getCookie(cname) {
-    var name = cname + '=';
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
+    let name = cname + '=';
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i += 1) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) == 0) {
+        if (c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
         }
     }
@@ -24,14 +24,14 @@ function getCookie(cname) {
 }
 
 function deleteCookie() {
-    var user = getCookie('username');
-    var expires = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
+    let user = getCookie('username');
+    let expires = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
     document.cookie = 'username=' + user + ';' + expires + ';path=/';
 }
 
 function checkCookie() {
-    var user = getCookie('username');
-    if (user == '') {
+    let user = getCookie('username');
+    if (user === '') {
         loadLogin();
     }
     else {
@@ -39,14 +39,14 @@ function checkCookie() {
     }
 }
 
-var loadLogin = function () {
+let loadLogin = function () {
     let container = document.querySelector('#container');
     let div_container_mt_40 = document.createElement('div');
     let div_title = document.createElement('div');
     let h1_title = document.createElement('h1');
     let h2_title = document.createElement('h2');
     let div_form = document.createElement('div');
-    let div_input = document.createElement('div');;
+    let div_input = document.createElement('div');
     let input_username = document.createElement('input');
     let span_group_button = document.createElement('span');
     let input_btn = document.createElement('input');
@@ -73,11 +73,11 @@ var loadLogin = function () {
     input_btn.onclick = function () {
         let div_username = document.querySelector('#username');
         let user = div_username.value;
-        if (user != '' && user != null) {
+        if (user !== '' && user !== null) {
             setCookie('username', user, 365);
             loadHome();
         }
-    }
+    };
 
     span_group_button.appendChild(input_btn);
     div_form.appendChild(div_input);
@@ -89,9 +89,7 @@ var loadLogin = function () {
     div_title.appendChild(h2_title);
     container.appendChild(div_title);
     container.appendChild(div_container_mt_40);
-
-
-}
+};
 
 let loadHome = function () {
     let div_overlay = document.querySelector('.overlay');
@@ -100,7 +98,7 @@ let loadHome = function () {
     deconnection.href = '';
     deconnection.onclick = function () {
         deleteCookie();
-    }
+    };
     div_overlay.appendChild(deconnection);
 
     let container = document.querySelector('#container');
@@ -128,7 +126,7 @@ let loadHome = function () {
     label_btn_manga.innerHTML = 'Manga';
     btn_manga.onclick = function () {
         document.location.href = '/manga.html';
-    }
+    };
 
     btn_anime.type = 'submit';
     btn_anime.name = 'submit';
@@ -136,11 +134,10 @@ let loadHome = function () {
     btn_anime.id = 'btn_anime';
     btn_anime.value = '';
     label_btn_anime.id = 'label_btn_anime';
-    label_btn_anime.innerHTML = 'Anime'
+    label_btn_anime.innerHTML = 'Anime';
     btn_anime.onclick = function () {
-        ;
         document.location.href = '/anime.html';
-    }
+    };
 
     while (container.firstChild) {
         container.removeChild(container.firstChild);
@@ -155,6 +152,6 @@ let loadHome = function () {
     div_btn.appendChild(div_manga);
     div_btn.appendChild(div_anime);
     container.appendChild(div_btn);
-}
+};
 
 checkCookie();

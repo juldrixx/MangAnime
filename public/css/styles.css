@@ -1,9 +1,9 @@
-body{background-color:#f1f1f2}
-.container{max-width: 90vw;}
-.fa-check{background:#0dab76;color:#fff;}
-.fa-times{background:#d10531;color:#fff;}
-.fa-link{background:#13a1ffc5;color:#fff;}
-.fa-trash{background:#554b4b;color:#fff;}
+body{background-color:#f1f1f2;color: #000000;}
+.container{max-width: 90%;}
+.fa-check{background-color:#0dab76;color:#fff;}
+.fa-times{background-color:#d10531;color:#fff;}
+.fa-link{background-color:#13a1ffc5;color:#fff;}
+.fa-trash{background-color:#554b4b;color:#fff;}
 a, a:hover{text-decoration: none;}
 
 header {position:relative;background-color:black;height:25VH;min-height:5rem;width:100%;overflow:hidden;user-select : none;}
@@ -41,7 +41,7 @@ header .fa-angle-left{position:relative;left:0;top:0;color:#fff;text-decoration:
 
 table #new_last_viewed::-webkit-inner-spin-button, table #new_last_viewed::-webkit-outer-spin-button{-webkit-appearance: none;margin:0;}
 table #new_last_read::-webkit-inner-spin-button, table #new_last_read::-webkit-outer-spin-button{-webkit-appearance: none;margin:0;}
-table .btn_ok{border:none;padding-top:3px;padding-bottom:3px;background:#ffffff;font-style:Bold;}
+table .btn_ok{border:none;padding-top:3px;padding-bottom:3px;background:#ffffff;font-weight:bold;}
 table .btn_ok:hover{background:#ebebeb;}
 
 #rss_input, #username_input{
