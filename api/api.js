@@ -1,5 +1,13 @@
 'use strict';
 
+// import des modules parser
+var parser_jetanime = require('./modules/parser_jetanime.js');
+var parser_fanfox = require('./modules/parser_fanfox.js');
+
+// import des modules db
+var db_anime_manager = require('./modules/db_anime_manager.js');
+var db_manga_manager = require('./modules/db_manga_manager.js');
+
 // import du module Express
 var express = require('express');
 var app = express();
@@ -18,300 +26,102 @@ app.use(bodyParser.json());
 
 app.get('/get/:type/:username', function (request, response) {
     console.log('############ GET ' + request.params.type + ' ############');
-    let db;
 
-    MongoClient.connect('mongodb://juldrixx:juldrix834679@ds255754.mlab.com:55754/manganime', {useNewUrlParser: true}, (err, client) => {
-        if (err) return console.log(err);
-        db = client.db('manganime');
-        db.collection('users')
-            .findOne({'type': request.params.type, 'name': request.params.username},
-                (err, result) => {
-                    if (result !== null) {
-                        let rss_url = result.rss_url;
+    var promise = new Promise(function (res, rej) {
+        try {
+            let db = eval('new db_' + request.params.type + '_manager()');
 
-                        if (rss_url.length === 0) {
-                            client.close();
-                            response.send([]);
-                        }
+            db.getRssUrl(request.params.username).then(function (rss_url) {
+                var fct_get_data = function (url) {
+                    return new Promise(function (resolve, reject) {
+                        let url_splitted = url.split('.');
+                        let site = url_splitted[0].includes('www') ? url_splitted[1] : url_splitted[0].split('://')[1];
 
-                        let datas = [];
-                        let itemsProcessed = 0;
-                        rss_url.forEach(element => {
-                            fetch(element)
-                                .then(function (reponse) {
-                                    return reponse.text();
+                        try {
+                            let parser = eval('new parser_' + site + '(\'' + url + '\')');
+                                
+                            parser.getInformation().then(function (information) {
+                                db.getInformation(request.params.username, information.title_url).then(function (informationDB) {
+                                    return informationDB;
                                 })
-                                .then(function (reponse) {
-                                    if (request.params.type === 'manga') {
-                                        let doc = new DOMParser().parseFromString(reponse);
-                                        let nodes = xpath.select('//item/title', doc);
-                                        let titles_chapters = [];
-
-                                        nodes.forEach(function (element) {
-                                            titles_chapters.push(element.firstChild.data);
+                                .catch(function () {
+                                    db.insert(request.params.username, information.title_url, information.release_number, information.release_date,
+                                    information.release_url,information.release_language, information.title).then(function (result) {
+                                        result.not_completed = true;
+                                        result.url = information.url;
+                                        resolve(result);
+                                    });
+                                })
+                                .then(function (informationDB) {
+                                    if (informationDB.last_release_viewed !== information.release_number) {
+                                        db.update(request.params.username, information.title_url, informationDB.last_release_viewed, information.release_number,
+                                        information.release_date, information.release_url,information.release_language, information.title).then(function (result) {
+                                            result.not_completed = true;
+                                            result.url = information.url;
+                                            resolve(result);
                                         });
-
-                                        let title = xpath.select('//channel/title', doc)[0].firstChild.data;
-                                        let title_chapter = titles_chapters[0];
-                                        let title_chapter_array = title_chapter.split('Ch.');
-                                        let chapter = parseInt(title_chapter_array[1]);
-                                        let new_chapter = false;
-                                        let title_url = element.split('/')[element.split('/').length - 1].split('.xml')[0];
-
-                                        db.collection(request.params.type)
-                                            .findOne({'name': request.params.username, 'title_url': title_url},
-                                                (err, result) => {
-                                                    if (result === null) {
-                                                        let myquery = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                            'last_read': 0,
-                                                            'last_chapter': chapter,
-                                                        };
-
-                                                        db.collection(request.params.type).insertOne(myquery, function (err, res) {
-                                                            if (err) throw err;
-                                                            console.log('1 document inserted');
-                                                        });
-                                                        result = myquery;
-                                                    }
-
-                                                    if (result.last_chapter !== chapter) {
-                                                        let myquery = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                        };
-
-                                                        let new_values = {
-                                                            $set: {
-                                                                'name': request.params.username,
-                                                                'title_url': title_url,
-                                                                'last_read': parseFloat(result.last_read),
-                                                                'last_chapter': parseFloat(chapter),
-                                                            },
-                                                        };
-                                                        db.collection(request.params.type).updateOne(myquery, new_values, function (err, res) {
-                                                            if (err) throw err;
-                                                            console.log('1 document updated');
-                                                        });
-
-                                                        result = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                            'last_read': parseFloat(result.last_read),
-                                                            'last_chapter': parseFloat(chapter),
-                                                        };
-                                                    }
-
-                                                    new_chapter = !(result.last_read === result.last_chapter);
-                                                    let link = xpath.select('//item/link', doc)[0].firstChild.data;
-                                                    let data = {
-                                                        'title': title,
-                                                        'last_read': parseFloat(result.last_read),
-                                                        'last_chapter': parseFloat(chapter),
-                                                        'url': link.split('/manga/')[0] + '/manga/' + link.split('/manga/')[1].split('/')[0] + '/',
-                                                        'not_completed': new_chapter,
-                                                    };
-
-                                                    datas.push(data);
-                                                    itemsProcessed += 1;
-                                                    if (itemsProcessed === rss_url.length) {
-                                                        response.set({'Content-Type': 'text/json', 'charset': 'utf-8'});
-                                                        client.close();
-                                                        response.send(JSON.stringify(datas));
-                                                    }
-
-                                                });
-                                    }
-                                    else if (request.params.type === 'anime') {
-                                        let doc = new DOMParser().parseFromString(reponse);
-                                        let nodes = xpath.select('//item/title', doc);
-                                        let titles = [];
-
-                                        nodes.forEach(function (element) {
-                                            titles.push(element.firstChild.data);
-                                        });
-
-                                        let title = titles[0];
-                                        let title_array = title.split(' ');
-                                        let episode = parseInt(title_array[title_array.length - 2]);
-                                        let new_episode = false;
-                                        let title_url = element.split('/')[element.split('/').length - 2];
-
-                                        db.collection(request.params.type)
-                                            .findOne({'name': request.params.username, 'title_url': title_url},
-                                                (err, result) => {
-                                                    if (result === null) {
-                                                        let myquery = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                            'last_viewed': 0,
-                                                            'last_episode': parseFloat(episode),
-                                                        };
-
-                                                        db.collection(request.params.type).insertOne(myquery, function (err, res) {
-                                                            if (err) throw err;
-                                                            console.log('1 document inserted');
-                                                            client.close();
-                                                        });
-                                                        result = myquery;
-                                                    }
-
-                                                    if (result.last_episode !== episode) {
-                                                        let myquery = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                        };
-
-                                                        let new_values = {
-                                                            $set: {
-                                                                'name': request.params.username,
-                                                                'title_url': title_url,
-                                                                'last_viewed': parseFloat(result.last_viewed),
-                                                                'last_episode': parseFloat(episode),
-                                                            },
-                                                        };
-                                                        db.collection(request.params.type).updateOne(myquery, new_values, function (err, res) {
-                                                            if (err) throw err;
-                                                            console.log('1 document updated');
-                                                        });
-
-                                                        result = {
-                                                            'name': request.params.username,
-                                                            'title_url': title_url,
-                                                            'last_viewed': parseFloat(result.last_viewed),
-                                                            'last_episode': parseFloat(episode),
-                                                        };
-                                                    }
-
-                                                    new_episode = !(result.last_viewed === result.last_episode);
-                                                    let data = {
-                                                        'title': title.replace(episode, '').replace('VOSTFR', '').replace('Episode', ''),
-                                                        'last_viewed': parseFloat(result.last_viewed),
-                                                        'last_episode': parseFloat(episode),
-                                                        'url': element.replace('rss', 'anime'),
-                                                        'not_completed': new_episode,
-                                                    };
-
-                                                    datas.push(data);
-                                                    itemsProcessed += 1;
-                                                    if (itemsProcessed === rss_url.length) {
-                                                        response.set({'Content-Type': 'text/json', 'charset': 'utf-8'});
-                                                        client.close();
-                                                        response.send(JSON.stringify(datas));
-                                                    }
-                                                });
                                     }
                                     else {
-                                        client.close();
-                                        response.send([]);
+                                        information.not_completed = false;
+                                        resolve({
+                                                'title': information.title,
+                                                'last_release_viewed': parseFloat(informationDB.last_release_viewed),
+                                                'last_release': parseFloat(information.release_number),
+                                                'release_date': information.release_date,
+                                                'release_url': information.release_url,
+                                                'release_language': information.release_language,
+                                                'url': information.url,
+                                                'not_completed': false,
+                                        });
                                     }
-                                })
-                                .catch(function (error) {
-                                    console.log(error);
                                 });
-                        });
+                            });
+                        } catch (error) {
+                            reject(error);
+                        }
+                    });
+                };
 
-                    }
-                    else {
-                        client.close();
-                        response.send([]);
-                    }
+                Promise.all(rss_url.map(fct_get_data)).then(function (result) {
+                    res(result);
+                })
+                .catch(function (err) {
+                    rej(err);
                 });
+            });
+        } catch (error) {
+            rej(error);
+        }
+    });
+    
+    promise.then(function (result) {
+        response.set({'Content-Type': 'text/json', 'charset': 'utf-8'});
+        response.send(JSON.stringify(result));
+    })
+    .catch(function (err) {
+        console.log(err);
+        response.send([]);
     });
 });
 
 app.get('/update/:type/:username/:title/:value', function (request, respond) {
     console.log('############ Update ' + request.params.type + ' ############');
-    let db;
-
-    MongoClient.connect('mongodb://juldrixx:juldrix834679@ds255754.mlab.com:55754/manganime', {useNewUrlParser: true}, (err, client) => {
-        if (err) return console.log(err);
-        db = client.db('manganime');
-        db.collection(request.params.type)
-            .findOne({'name': request.params.username, 'title_url': request.params.title},
-                (err, result) => {
-                    if (request.params.type === 'manga') {
-                        if (result === null) {
-                            let myquery = {
-                                'name': request.params.username,
-                                'title_url': request.params.title,
-                                'last_read': parseFloat(request.params.value),
-                                'last_chapter': 'NA',
-                            };
-
-                            db.collection(request.params.type).insertOne(myquery, function (err, res) {
-                                if (err) throw err;
-                                console.log('1 document inserted');
-                                client.close();
-                            });
-                        }
-                        else {
-                            let update_query = {
-                                'name': request.params.username,
-                                'title_url': request.params.title,
-                            };
-
-                            let new_values = {
-                                $set: {
-                                    'name': request.params.username,
-                                    'title_url': request.params.title,
-                                    'last_read': parseFloat(request.params.value),
-                                    'last_chapter': parseFloat(result.last_chapter),
-                                },
-                            };
-
-                            db.collection(request.params.type).updateOne(update_query, new_values, function (err, res) {
-                                if (err) throw err;
-                                console.log('1 document updated');
-                                client.close();
-                                respond.send();
-                            });
-                        }
-
-                    }
-                    else if (result === null) {
-                        let myquery = {
-                            'name': request.params.username,
-                            'title_url': request.params.title,
-                            'last_viewed': parseFloat(request.params.value),
-                            'last_episode': 'NA',
-                        };
-
-                        db.collection(request.params.type).insertOne(myquery, function (err, res) {
-                            if (err) throw err;
-                            console.log('1 document inserted');
-                            client.close();
-                        });
-                    }
-                    else {
-                        let update_query = {
-                            'name': request.params.username,
-                            'title_url': request.params.title,
-                        };
-
-                        let new_values = {
-                            $set: {
-                                'name': request.params.username,
-                                'title_url': request.params.title,
-                                'last_viewed': parseFloat(request.params.value),
-                                'last_episode': parseFloat(result.last_episode),
-                            },
-                        };
-
-                        db.collection(request.params.type).updateOne(update_query, new_values, function (err, res) {
-                            if (err) throw err;
-                            console.log('1 document updated');
-                            client.close();
-                            respond.send();
-                        });
-                    }
-                });
-    });
+    let db = eval('new db_' + request.params.type + '_manager()');
+    db.updateOne(request.params.username, request.params.title, request.params.value).then(function (result) {
+            respond.send();
+        });
 });
 
 app.post('/add', function (request, response) {
-    console.log('############ ADD ' + request.body.type + ' ############');
+    /*console.log('############ ADD ' + request.body.type + ' ############');
+    let db = eval('new db_' + request.params.type + '_manager()');
+    db.insertOne(request.params.username, information.title_url, information.release_number, information.release_date,
+        information.release_url,information.release_language, information.title).then(function (result) {
+            result.not_completed = true;
+            result.url = information.url;
+            resolve(result);
+        });*/
+    /*
     let db;
 
     MongoClient.connect('mongodb://juldrixx:juldrix834679@ds255754.mlab.com:55754/manganime', {useNewUrlParser: true}, (err, client) => {
@@ -359,7 +169,7 @@ app.post('/add', function (request, response) {
                         });
                     }
                 });
-    });
+    });*/
 });
 
 app.post('/del/:type', function (request, respond) {

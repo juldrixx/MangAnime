@@ -124,6 +124,7 @@ let getAnime = function () {
             let entete = document.createElement('thead');
             let row_entete = document.createElement('tr');
             let col_state = document.createElement('th');
+            let col_last_update = document.createElement('th');
             let col_title = document.createElement('th');
             let col_last_viewed = document.createElement('th');
             let col_last_episode = document.createElement('th');
@@ -132,6 +133,8 @@ let getAnime = function () {
             tableau.className = 'table table-hover table-dark';
             col_state.scope = 'col';
             col_state.innerHTML = '';
+            col_last_update.scope = 'col';
+            col_last_update.innerHTML = 'Date de la dernière sortie';
             col_title.scope = 'col';
             col_title.innerHTML = 'Anime';
             col_last_viewed.scope = 'col';
@@ -139,9 +142,9 @@ let getAnime = function () {
             col_last_episode.scope = 'col';
             col_last_episode.innerHTML = 'Dernier épisode sorti';
             col_btn.scope = 'col';
-            col_state.innerHTML = '';
 
             row_entete.appendChild(col_state);
+            row_entete.appendChild(col_last_update);
             row_entete.appendChild(col_title);
             row_entete.appendChild(col_last_viewed);
             row_entete.appendChild(col_last_episode);
@@ -157,6 +160,7 @@ let getAnime = function () {
                 let parent = body;
                 let row = document.createElement('tr');
                 let state = document.createElement('th');
+                let last_update = document.createElement('th');
                 let title = document.createElement('td');
                 let last_viewed = document.createElement('td');
                 let last_episode = document.createElement('td');
@@ -178,7 +182,7 @@ let getAnime = function () {
                 }
 
                 title.innerHTML = element.title;
-                last_viewed.innerHTML = element.last_viewed;
+                last_viewed.innerHTML = element.last_release_viewed;
                 last_viewed.onclick = function () {
 
                     last_viewed.innerHTML = '';
@@ -193,7 +197,7 @@ let getAnime = function () {
                         zone_nombre.value = 1;
                     }
                     else {
-                        zone_nombre.value = element.last_viewed;
+                        zone_nombre.value = element.last_release_viewed;
                     }
 
                     zone_nombre_btn.type = 'submit';
@@ -201,18 +205,19 @@ let getAnime = function () {
                     zone_nombre_btn.className = 'btn_ok';
                     zone_nombre_btn.value = 'OK';
                     zone_nombre_btn.onclick = function () {
-                        if (document.querySelector('#new_last_viewed').value <= element.last_episode && document.querySelector('#new_last_viewed').value >= 1) {
-                            updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], document.querySelector('#new_last_viewed').value);
+                        if (parseFloat(document.querySelector('#new_last_viewed').value) <= element.last_release && parseFloat(document.querySelector('#new_last_viewed').value) >= 1) {
+                            updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], parseFloat(document.querySelector('#new_last_viewed').value));
                         }
                     };
 
                     zone_nombre.min = 1;
-                    zone_nombre.max = element.last_episode;
+                    zone_nombre.max = element.last_release;
+                    zone_nombre.step = 0.1;
 
                     last_viewed.appendChild(zone_nombre);
                     last_viewed.appendChild(zone_nombre_btn);
                 };
-                last_episode.innerHTML = element.last_episode;
+                last_episode.innerHTML = element.last_release;
 
                 ul_icon.className = 'icon_manga_anime';
                 if (!element.not_completed) {
@@ -222,7 +227,7 @@ let getAnime = function () {
                     a_state.className = 'fa fa-times';
                     a_state.href = '';
                     a_state.addEventListener('click', function () {
-                        updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], element.last_episode);
+                        updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], element.last_release);
                     });
                 }
 

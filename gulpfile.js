@@ -19,7 +19,7 @@ var gulp = require('gulp'),
     watch = require('gulp-watch');
 
 var inputPaths = {
-    JavaScript: ['*.js', 'public/js/*.js', 'api/api.js'],
+    JavaScript: ['*.js', 'public/js/*.js', 'api/api.js', 'api/modules/*.js'],
     Css: 'public/css/*.css',
     Html: 'public/*.html',
 };

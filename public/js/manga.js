@@ -164,9 +164,9 @@ let getManga = function () {
                 else {
                     state.innerHTML = '';
                 }
-
+                
                 title.innerHTML = element.title;
-                last_read.innerHTML = element.last_read;
+                last_read.innerHTML = element.last_release_viewed;
                 last_read.onclick = function () {
 
                     last_read.innerHTML = '';
@@ -174,14 +174,14 @@ let getManga = function () {
 
                     let zone_nombre = document.createElement('input');
                     let zone_nombre_btn = document.createElement('input');
-
+                    
                     zone_nombre.type = 'number';
                     zone_nombre.id = 'new_last_read';
                     if (element.last_read === 0) {
                         zone_nombre.value = 1;
                     }
                     else {
-                        zone_nombre.value = element.last_read;
+                        zone_nombre.value = element.last_release_viewed;
                     }
 
                     zone_nombre_btn.type = 'submit';
@@ -189,18 +189,20 @@ let getManga = function () {
                     zone_nombre_btn.className = 'btn_ok';
                     zone_nombre_btn.value = 'OK';
                     zone_nombre_btn.onclick = function () {
-                        if (document.querySelector('#new_last_read').value <= element.last_chapter && document.querySelector('#new_last_read').value >= 1) {
-                            updateManga(username, element.url.split('/')[element.url.split('/').length - 2], document.querySelector('#new_last_read').value);
+                        console.log(parseFloat(document.querySelector('#new_last_read').value), element.last_release, parseFloat(document.querySelector('#new_last_read').value) <= element.last_release, parseFloat(document.querySelector('#new_last_read').value) >= 1)
+                        if (parseFloat(document.querySelector('#new_last_read').value) <= element.last_release && parseFloat(document.querySelector('#new_last_read').value) >= 1) {
+                            updateManga(username, element.url.split('/')[element.url.split('/').length - 2], parseFloat(document.querySelector('#new_last_read').value));
                         }
                     };
 
                     zone_nombre.min = 1;
-                    zone_nombre.max = element.last_chapter;
+                    zone_nombre.max = element.last_release;
+                    zone_nombre.step = 0.1;
 
                     last_read.appendChild(zone_nombre);
                     last_read.appendChild(zone_nombre_btn);
                 };
-                last_chapter.innerHTML = element.last_chapter;
+                last_chapter.innerHTML = element.last_release;
 
                 ul_icon.className = 'icon_manga_anime';
                 if (!element.not_completed) {
@@ -210,7 +212,7 @@ let getManga = function () {
                     a_state.className = 'fa fa-times';
                     a_state.href = '';
                     a_state.addEventListener('click', function () {
-                        updateManga(username, element.url.split('/')[element.url.split('/').length - 2], element.last_chapter);
+                        updateManga(username, element.url.split('/')[element.url.split('/').length - 2], element.last_release);
                     });
                 }
 
