@@ -4,7 +4,7 @@ body{background-color:#f1f1f2;color: #000000;}
 .fa-times{background-color:#d10531;color:#fff;}
 .fa-link{background-color:#13a1ffc5;color:#fff;}
 .fa-trash{background-color:#554b4b;color:#fff;}
-a, a:hover{text-decoration: none;}
+a, a:hover{text-decoration: none; cursor: pointer;}
 
 header {position:relative;background-color:black;height:25VH;min-height:5rem;width:100%;overflow:hidden;user-select : none;}
 header video {position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;z-index:0;-ms-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-webkit-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);}
@@ -72,6 +72,9 @@ table .btn_ok:hover{background:#ebebeb;}
     border-left: solid 1px #ccc;
 }
 
+#rss_input.error{
+    border-color: #d10531;
+}
 
 @media only screen and (max-width:600px){
 header {background-color:#143c49;}
@@ -96,4 +99,20 @@ header .fa-angle-left{font-size:7vw;}
 .fa-link{color:#13a1ffc5;}
 .fa-trash{color:#554b4b;}
 .fa-check{color:#36eb08;}
+}
+
+.table .textOverflow30 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 0;
+    min-width: 30vw;
+}
+
+.table .textOverflow10 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 0;
+    min-width: 10vw;
 }

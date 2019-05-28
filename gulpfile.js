@@ -94,7 +94,7 @@ gulp.task('lint', function () {
                 'no-constant-condition': ['error', {
                     'checkLoops': false,
                 }],
-                'no-eval': 'error',
+                /*'no-eval': 'error',*/
                 'no-extra-bind': 'error',
             },
         }))

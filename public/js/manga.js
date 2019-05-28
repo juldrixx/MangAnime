@@ -84,12 +84,22 @@ let getManga = function () {
                 'rss': rss,
             }),
         })
-            .then(function () {
-                location.reload();
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (response) {
+            if (!eval(response)) {
+                throw Error();
+            }
+            location.reload();
+        })
+        .catch(function () {
+            div_form.classList.add('error');
+            input_url_manga.value = '';
+            setTimeout(function () {
+                div_form.classList.remove('error');
+            }, 200);
+        });
     };
 
     span_group_button.appendChild(input_btn);
@@ -102,16 +112,13 @@ let getManga = function () {
         .then(function (reponse) {
             return reponse.json();
         })
-        .catch(function (error) {
-            getManga();
-            console.log(error);
-        })
         .then(function (mangas) {
             let parent = div_add_manga;
             let tableau = document.createElement('table');
             let entete = document.createElement('thead');
             let row_entete = document.createElement('tr');
             let col_state = document.createElement('th');
+            let col_last_release_date = document.createElement('th');
             let col_title = document.createElement('th');
             let col_last_read = document.createElement('th');
             let col_last_chapter = document.createElement('th');
@@ -120,16 +127,22 @@ let getManga = function () {
             tableau.className = 'table table-hover table-dark';
             col_state.scope = 'col';
             col_state.innerHTML = '';
+            col_last_release_date.className = 'textOverflow10';
+            col_last_release_date.scope = 'col';
+            col_last_release_date.innerHTML = 'Date de la dernière sortie';
             col_title.scope = 'col';
             col_title.innerHTML = 'Manga';
+            col_last_read.className = 'textOverflow10';
             col_last_read.scope = 'col';
             col_last_read.innerHTML = 'Dernier chapitre lu';
+            col_last_chapter.className = 'textOverflow10';
             col_last_chapter.scope = 'col';
             col_last_chapter.innerHTML = 'Dernier chapitre sorti';
             col_btn.scope = 'col';
             col_state.innerHTML = '';
 
             row_entete.appendChild(col_state);
+            row_entete.appendChild(col_last_release_date);
             row_entete.appendChild(col_title);
             row_entete.appendChild(col_last_read);
             row_entete.appendChild(col_last_chapter);
@@ -145,6 +158,7 @@ let getManga = function () {
                 let parent = body;
                 let row = document.createElement('tr');
                 let state = document.createElement('th');
+                let last_release_date = document.createElement('td');
                 let title = document.createElement('td');
                 let last_read = document.createElement('td');
                 let last_chapter = document.createElement('td');
@@ -158,14 +172,22 @@ let getManga = function () {
                 let a_trash = document.createElement('a');
 
                 state.scope = 'row';
+                state.className = 'textOverflow10';
                 if (element.not_completed) {
                     state.innerHTML = 'Not completed';
                 }
                 else {
                     state.innerHTML = '';
                 }
-                
+
+                const month = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                const day = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                last_release_date.innerHTML = element.release_date.day + ' ' + month[element.release_date.month] + ' ' + element.release_date.year;
+                last_release_date.title = day[element.release_date.day_name];
+
+                title.className = 'textOverflow30';
                 title.innerHTML = element.title;
+                title.title = element.title;
                 last_read.innerHTML = element.last_release_viewed;
                 last_read.onclick = function () {
 
@@ -174,7 +196,7 @@ let getManga = function () {
 
                     let zone_nombre = document.createElement('input');
                     let zone_nombre_btn = document.createElement('input');
-                    
+
                     zone_nombre.type = 'number';
                     zone_nombre.id = 'new_last_read';
                     if (element.last_read === 0) {
@@ -189,7 +211,6 @@ let getManga = function () {
                     zone_nombre_btn.className = 'btn_ok';
                     zone_nombre_btn.value = 'OK';
                     zone_nombre_btn.onclick = function () {
-                        console.log(parseFloat(document.querySelector('#new_last_read').value), element.last_release, parseFloat(document.querySelector('#new_last_read').value) <= element.last_release, parseFloat(document.querySelector('#new_last_read').value) >= 1)
                         if (parseFloat(document.querySelector('#new_last_read').value) <= element.last_release && parseFloat(document.querySelector('#new_last_read').value) >= 1) {
                             updateManga(username, element.url.split('/')[element.url.split('/').length - 2], parseFloat(document.querySelector('#new_last_read').value));
                         }
@@ -210,7 +231,6 @@ let getManga = function () {
                 }
                 else {
                     a_state.className = 'fa fa-times';
-                    a_state.href = '';
                     a_state.addEventListener('click', function () {
                         updateManga(username, element.url.split('/')[element.url.split('/').length - 2], element.last_release);
                     });
@@ -220,7 +240,6 @@ let getManga = function () {
                 a_link.target = '_blank';
                 a_link.className = 'fa fa-link';
                 a_trash.className = 'fa fa-trash';
-                a_trash.href = '';
                 a_trash.addEventListener('click', function () {
                     fetch('/api/del/manga', {
                         method: 'POST',
@@ -235,13 +254,13 @@ let getManga = function () {
                             'title': element.url.split('/')[element.url.split('/').length - 2],
                         }),
                     })
-                        .then(function () {
-                            location.reload();
-                        })
-                        .catch(function (error) {
-                            getManga();
-                            console.log(error);
-                        });
+                    .then(function () {
+                        location.reload();
+                    })
+                    .catch(function (error) {
+                        getManga();
+                        console.log(error);
+                    });
                 });
 
                 li_trash.appendChild(a_trash);
@@ -252,6 +271,7 @@ let getManga = function () {
                 ul_icon.appendChild(li_trash);
                 btn.appendChild(ul_icon);
                 row.appendChild(state);
+                row.appendChild(last_release_date);
                 row.appendChild(title);
                 row.appendChild(last_read);
                 row.appendChild(last_chapter);
@@ -263,6 +283,7 @@ let getManga = function () {
             parent.appendChild(tableau);
         })
         .catch(function (error) {
+            getManga();
             console.log(error);
         });
 };

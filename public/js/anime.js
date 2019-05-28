@@ -48,7 +48,7 @@ let getAnime = function () {
 
     div_container_mt.className = 'container mt-100';
     h1_title.innerHTML = 'Mes animes';
-    h2_season.innerHTML = saison[Math.floor(month/3)] + ' ' + new Date().getFullYear();;
+    h2_season.innerHTML = saison[Math.floor(month / 3)] + ' ' + new Date().getFullYear();
     div_add_anime.id = 'add_anime';
     div_anime.className = 'row mt-30';
     div_anime.id = 'anime';
@@ -95,12 +95,22 @@ let getAnime = function () {
                 'rss': rss,
             }),
         })
-            .then(function () {
-                location.reload();
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (response) {
+            if (!eval(response)) {
+                throw Error();
+            }
+            location.reload();
+        })
+        .catch(function () {
+            div_form.classList.add('error');
+            input_url_anime.value = '';
+            setTimeout(function () {
+                div_form.classList.remove('error');
+            }, 200);
+        });
     };
 
     span_group_button.appendChild(input_btn);
@@ -124,7 +134,7 @@ let getAnime = function () {
             let entete = document.createElement('thead');
             let row_entete = document.createElement('tr');
             let col_state = document.createElement('th');
-            let col_last_update = document.createElement('th');
+            let col_last_release_date = document.createElement('th');
             let col_title = document.createElement('th');
             let col_last_viewed = document.createElement('th');
             let col_last_episode = document.createElement('th');
@@ -133,18 +143,21 @@ let getAnime = function () {
             tableau.className = 'table table-hover table-dark';
             col_state.scope = 'col';
             col_state.innerHTML = '';
-            col_last_update.scope = 'col';
-            col_last_update.innerHTML = 'Date de la dernière sortie';
+            col_last_release_date.className = 'textOverflow10';
+            col_last_release_date.scope = 'col';
+            col_last_release_date.innerHTML = 'Date de la dernière sortie';
             col_title.scope = 'col';
             col_title.innerHTML = 'Anime';
+            col_last_viewed.className = 'textOverflow10';
             col_last_viewed.scope = 'col';
             col_last_viewed.innerHTML = 'Dernier épisode vu';
+            col_last_episode.className = 'textOverflow10';
             col_last_episode.scope = 'col';
             col_last_episode.innerHTML = 'Dernier épisode sorti';
             col_btn.scope = 'col';
 
             row_entete.appendChild(col_state);
-            row_entete.appendChild(col_last_update);
+            row_entete.appendChild(col_last_release_date);
             row_entete.appendChild(col_title);
             row_entete.appendChild(col_last_viewed);
             row_entete.appendChild(col_last_episode);
@@ -160,7 +173,7 @@ let getAnime = function () {
                 let parent = body;
                 let row = document.createElement('tr');
                 let state = document.createElement('th');
-                let last_update = document.createElement('th');
+                let last_release_date = document.createElement('td');
                 let title = document.createElement('td');
                 let last_viewed = document.createElement('td');
                 let last_episode = document.createElement('td');
@@ -174,6 +187,7 @@ let getAnime = function () {
                 let a_trash = document.createElement('a');
 
                 state.scope = 'row';
+                state.className = 'textOverflow10';
                 if (element.not_completed) {
                     state.innerHTML = 'Not completed';
                 }
@@ -181,7 +195,14 @@ let getAnime = function () {
                     state.innerHTML = '';
                 }
 
+                const month = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                const day = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                last_release_date.innerHTML = element.release_date.day + ' ' + month[element.release_date.month] + ' ' + element.release_date.year;
+                last_release_date.title = day[element.release_date.day_name];
+
+                title.className = 'textOverflow30';
                 title.innerHTML = element.title;
+                title.title = element.title;
                 last_viewed.innerHTML = element.last_release_viewed;
                 last_viewed.onclick = function () {
 
@@ -225,7 +246,6 @@ let getAnime = function () {
                 }
                 else {
                     a_state.className = 'fa fa-times';
-                    a_state.href = '';
                     a_state.addEventListener('click', function () {
                         updateAnime(username, element.url.split('/')[element.url.split('/').length - 2], element.last_release);
                     });
@@ -235,7 +255,6 @@ let getAnime = function () {
                 a_link.target = '_blank';
                 a_link.className = 'fa fa-link';
                 a_trash.className = 'fa fa-trash';
-                a_trash.href = '';
                 a_trash.addEventListener('click', function () {
                     fetch('/api/del/anime', {
                         method: 'POST',
@@ -266,6 +285,7 @@ let getAnime = function () {
                 ul_icon.appendChild(li_trash);
                 btn.appendChild(ul_icon);
                 row.appendChild(state);
+                row.appendChild(last_release_date);
                 row.appendChild(title);
                 row.appendChild(last_viewed);
                 row.appendChild(last_episode);
