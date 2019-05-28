@@ -3,36 +3,38 @@ var fetch = require('node-fetch');
 var xpath = require('xpath');
 var DOMParser = require('xmldom').DOMParser;
 
-var parser_fanfox = function (rss_url) {
+var parser_japscan = function (rss_url) {
     var _ = this;
     _.rss_url = rss_url;
 };
 
 
-parser_fanfox.prototype.getInformation = function () {
+parser_japscan.prototype.getInformation = function () {
     var _ = this;
     return new Promise(function (resolve, reject) {
         fetch(_.rss_url)
         .then(function (reponse) {
+            console.log(reponse);
             return reponse.text();
         })
         .then(function (reponse) {
             try {
                 let doc = new DOMParser().parseFromString(reponse);
+
                 let date = xpath.select('//item[1]/pubDate', doc)[0].firstChild.data;
                 let day_date = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                 let month_date = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-                let title = xpath.select('//channel[1]/title', doc)[0].firstChild.data;
-                let release_url = xpath.select('//item[1]/link', doc)[0].firstChild.data;
+                let title = xpath.select('//channel[1]/title', doc)[0].firstChild.data.replace('Rss ', '').trim();
+                let release_url = xpath.select('//channel[1]/link', doc)[0].firstChild.data + xpath.select('//item[1]/link', doc)[0].firstChild.data;
                 let release_date = {
                     'day_name': day_date.indexOf(date.split(',')[0]),
                     'day': parseInt(date.split(' ')[1]),
                     'month': month_date.indexOf(date.split(' ')[2]),
                     'year': parseInt(date.split(' ')[3]),
                 };
-                let release_number = parseFloat(xpath.select('//item[1]/title', doc)[0].firstChild.data.split('Ch.')[1]);
-                let release_language = 'VUS';
+                let release_number = parseFloat(xpath.select('//item[1]/title', doc)[0].firstChild.data.split(' ')[xpath.select('//item[1]/title', doc)[0].firstChild.data.split(' ').length - 2]);
+                let release_language = xpath.select('//item[1]/title', doc)[0].firstChild.data.split(' ')[xpath.select('//item[1]/title', doc)[0].firstChild.data.split(' ') - 1];
 
                 resolve({
                     'title': title.trim(),
@@ -40,8 +42,8 @@ parser_fanfox.prototype.getInformation = function () {
                     'release_date': release_date,
                     'release_number': release_number,
                     'release_language': release_language,
-                    'title_url': _.rss_url.split('/')[_.rss_url.split('/').length - 1].split('.xml')[0],
-                    'url': release_url.split('/manga/')[0] + '/manga/' + release_url.split('/manga/')[1].split('/')[0] + '/',
+                    'title_url': _.rss_url.split('/')[_.rss_url.split('/').length - 2],
+                    'url': _.rss_url.replace('rss', 'manga'),
                 });
             }
             catch (error) {
@@ -55,7 +57,7 @@ parser_fanfox.prototype.getInformation = function () {
     });
 };
 
-parser_fanfox.prototype.verifyURL = function () {
+parser_japscan.prototype.verifyURL = function () {
     var _ = this;
     return new Promise(function (resolve, reject) {
         fetch(_.rss_url)
@@ -76,4 +78,4 @@ parser_fanfox.prototype.verifyURL = function () {
     });
 };
 
-module.exports = parser_fanfox;
+module.exports = parser_japscan;

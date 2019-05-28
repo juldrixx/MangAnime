@@ -3,6 +3,7 @@
 // import des modules parser
 var parser_jetanime = require('./modules/parser_jetanime.js');
 var parser_fanfox = require('./modules/parser_fanfox.js');
+var parser_japscan = require('./modules/parser_japscan.js');
 
 // import des modules db7
 var db_users_manager = require('./modules/db_users_manager.js');
@@ -147,7 +148,7 @@ app.post('/add', function (request, response) {
     promise.then(function () {
         response.send(true);
     })
-    .catch(function () {
+    .catch(function (err) {
         console.log(err);
         response.send(false);
     });

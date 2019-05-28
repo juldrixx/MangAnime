@@ -45,6 +45,7 @@ parser_jetanime.prototype.getInformation = function () {
                 });
             }
             catch (error) {
+                console.log(error);
                 reject('RSS URL INCORRECT !');
             }
         })
