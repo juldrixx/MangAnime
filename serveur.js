@@ -1,8 +1,3 @@
-/*
-	GUITTON Julien
-	COUGNAUD Julien
-*/
-
 'use strict';
 
 var express = require('express');
