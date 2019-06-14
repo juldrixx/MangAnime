@@ -139,7 +139,6 @@ let getManga = function () {
             col_last_chapter.scope = 'col';
             col_last_chapter.innerHTML = 'Dernier chapitre sorti';
             col_btn.scope = 'col';
-            col_state.innerHTML = '';
 
             row_entete.appendChild(col_state);
             row_entete.appendChild(col_last_release_date);
