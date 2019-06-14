@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "express": "^4.15.2",
-    "http-proxy-agent": "^1.0.0",
+    "http-proxy-agent": ">=2.1.0",
     "node-fetch": "^1.6.3",
     "object.entries": "^1.0.4",
     "urlencode": "^1.1.0",
